@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { useState} from 'react';
+import { useState, useEffect } from 'react';
 import styles from '../styles/Home.module.css'
 
 import WhiteList from '../components/Whitelist';
@@ -7,7 +7,72 @@ import WhiteList from '../components/Whitelist';
 export default function Home() {
   const [collections, setCollections] = useState([]);
 
+  const kalamintContractAddress = "KT1EpGgjQs73QfFJs9z7m1Mxm5MTnpC2tqse"
+  const hackedBMAccount = "tz1RH8gwbXe4PBTNrJzCDLuhDnDJw8ck5tm6"
+  const apiCollectionNames = `https://api.tzkt.io/v1/accounts/${hackedBMAccount}/operations?entrypoint=mint`
 
+  const getCollections = async () => {
+    let collectionList = []
+  
+    console.log("LOADING YOUR API CALL")
+    const res = await fetch(apiCollectionNames);
+    console.log(res);
+    const data = await res.json()
+    console.log(data)
+    for(let i = 0; i<data.length-1; i++){
+      let dup = 0
+      const collection = data[i].parameter.value.name
+      if(collectionList.length > 0) {
+        for(let k = 0; k<collectionList.length; k++){ 
+          if(Object.values(collectionList[k]).includes(`${collection}`)) {
+            dup = 1
+          }
+        }
+        if (dup == 0) {
+          collectionList.push({"collectionName": `${collection}`})          
+        }
+      } else {
+        collectionList.push({"collectionName": `${collection}`})
+      }
+    }
+    collectionList.forEach(object => {
+      object.holders = [];
+    });
+    setCollections(collectionList)
+    await getHolders()
+  }
+
+  const getHolders = async () => {
+    let cutOffDate = 1659358800
+    console.log("LOADING YOUR HOLDER CALL")
+    let collectionList = collections
+
+    for(let i = 0; i<collections.length; i++){
+      
+    const apiHolders = `https://api.tzkt.io/v1/tokens/balances?token.contract=${kalamintContractAddress}&token.metadata.name=${collections[i].collectionName}&balance=1&account.ne=${hackedBMAccount}`;
+
+    const res = await fetch(apiHolders);
+    console.log(res);
+    const data = await res.json()
+    console.log(`${collections[i].collectionName}`)
+    console.log(data);
+
+    for(let k = 0; k<data.length; k++) {
+      let index = collectionList.findIndex(e => e.collectionName === `${collections[i].collectionName}`);
+      const holdingDate = new Date((data[k].lastTime.split("T"))[0]);
+      const unixTimeStamp = Math.floor(holdingDate.getTime() / 1000);
+      // console.log(unixTimeStamp)
+      // console.log(cutOffDate)
+
+      if(unixTimeStamp < cutOffDate) {
+        collectionList[index].holders = [...collectionList[index].holders, [`${data[k].account.address}`]];
+      }
+
+    }
+    }
+    setCollections(collectionList)
+    console.log(collections)
+}
 
   return (
     <div className={styles.container}>
@@ -20,6 +85,8 @@ export default function Home() {
         <WhiteList
           collections={collections}
           setCollections={setCollections}
+          getHolders={getHolders}
+          getCollections={getCollections}
         />
       </main>
       

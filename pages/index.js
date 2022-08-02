@@ -1,52 +1,13 @@
 import Head from 'next/head'
-import { stringify } from 'postcss';
-import { useState, useEffect} from 'react';
+import { useState} from 'react';
 import styles from '../styles/Home.module.css'
 
 import WhiteList from '../components/Whitelist';
 
 export default function Home() {
   const [collections, setCollections] = useState([]);
-  let list = []
-  const kalamintContractCreatorAddress = "tz1SotrT1MEeC8bNeGzgBLUb3ryfASsFsdun"
-  const kalamintContractAddress = "KT1EpGgjQs73QfFJs9z7m1Mxm5MTnpC2tqse"
-  const hackedBMAccount = "tz1RH8gwbXe4PBTNrJzCDLuhDnDJw8ck5tm6"
-  const collectionIdCracksRarityA = "4752" // this is the collection ID for TezOrigins Cracks in the Cryptoverse - Rarity A
-  const collectionId2 = "4753"  // this is the collection ID for TezOrigins A Marriage of Ideals - Rarity A
-  const collectionName = "Chapter 00: Tezception"
-  const creatorName = "tezosorigins"
-  //const api = `https://api.tzkt.io/v1/tokens?metadata.collectionId=${collectionId}`;
-  //const api = `https://api.tzkt.io/v1/tokens/balances?token.contract=${kalamintContractAddress}&token.metadata.name=${collections[0]}&balance=1&account.ne=${hackedBMAccount}`;
 
-  const api2 = `https://api.tzkt.io/v1/accounts/${hackedBMAccount}/operations?entrypoint=mint`
-  const apiOptions = { mode: "no-cors" }
-// IF BALANCE IS ZERO IT MEANS THEY SOLD IT
-  const whitelist = async (url, options) => {
-    console.log("LOADING YOUR API CALL")
-    const res = await fetch(url);
-    console.log(res);
-    const data = await res.json()
-    console.log(data);
-}
-const test = async (url, options) => {
-  console.log("LOADING YOUR API2 CALL")
-  const res = await fetch(url);
-  console.log(res);
-  const data = await res.json()
-  //console.log(data)
-  for(let i = 0; i<data.length-1; i++){
-    const collection = data[i].parameter.value.name
-    if(!list.includes(collection)) {
-      list.push(collection)
-    }
-  }
-  setCollections(list)
-}
-useEffect(() => {
-  test(api2);
-}, []);
-// data[i].parameter.value.name
-//const accounts = whitelist(api, apiOptions);
+
 
   return (
     <div className={styles.container}>

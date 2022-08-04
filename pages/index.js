@@ -6,7 +6,7 @@ import WhiteList from '../components/Whitelist';
 
 export default function Home() {
   const [collections, setCollections] = useState([]);
-
+ // const [holders, setHolders] = useState([])
 
   const start = () => {
     console.log("HelloOOOOO")
@@ -14,7 +14,7 @@ export default function Home() {
   
   useEffect( () => {
     start();
-  }, [collections]);
+  }, []);
 
   return (
     <div className={styles.container}>

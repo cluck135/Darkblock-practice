@@ -46,6 +46,7 @@ export default function WhiteList({collections, setCollections}) {
     let cutOffDate = 1659358800
     console.log("LOADING YOUR HOLDER CALL")
     let dup = 0
+    let holderCount = [];
     for(let i = 0; i<collectionList.length; i++){
       
     const apiHolders = `https://api.tzkt.io/v1/tokens/balances?token.contract=${kalamintContractAddress}&token.metadata.name=${collectionList[i].collectionName}&balance=1&account.ne=${BMAccount}`;
@@ -67,17 +68,23 @@ export default function WhiteList({collections, setCollections}) {
       const holder = data[k].account.address
       if(data.length-1 >= collectionList[index].holders.length) {
           if(collectionList[index].holders.length > 0) {
-              // if(collectionList[index].holders.includes(`${holder}`)) {
-              //   dup = 1
-              // }
-              // if (dup == 0) {
+              if(collectionList[index].holders.includes(`${holder}`)) {
+                dup = 1
+              }
+              if (dup == 0) {
                 if(unixTimeStamp < cutOffDate) {
-                  collectionList[index].holders = [...collectionList[index].holders, `${data[k].account.address}`];
+                  collectionList[index].holders = [...collectionList[index].holders, `${holder}`];
+                //  if(!holderCount.includes(`${holder}`)){
+                    holderCount.push(holder)
+                //  }
                 }      
-              //}
+              }
           } else {
             if(unixTimeStamp < cutOffDate) {
-              collectionList[index].holders = [...collectionList[index].holders, `${data[k].account.address}`];
+              collectionList[index].holders = [...collectionList[index].holders, `${holder}`];
+             // if(!holderCount.includes(`${holder}`)){
+                holderCount.push(holder)
+             // }
             }
           }
         }
@@ -85,19 +92,10 @@ export default function WhiteList({collections, setCollections}) {
     }
   }
   setCollections([...collections, collectionList])
-  console.log("COLLECTIONS")
+  console.log("COLLECTIONS")  
+  console.log(holderCount)  
 
-  sendToFile();
-}
-
-const sendToFile = () => {
-try {
-  fs.writeFileSync('../../data/text.txt', collectionList);
-  // file written successfully
-} catch (err) {
-  console.error(err);
-}
-
+  console.log("holder list length " + holderCount.length)
 }
 useEffect( () => {
   const fetchData = async () => {
